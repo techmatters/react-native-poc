@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, ScrollView, Text, TextInput, View } from "react-native";
+import { Camera, CameraType } from "expo-camera";
+import {
+  StyleSheet,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Geolocation from "@react-native-community/geolocation";
 
 export default function App() {
   const [name, setName] = useState("");
   const [location, setLocation] = useState(null);
 
+  // need some custom code to handle web browser permission stuff vs. native app
+
   useEffect(() => {
     Geolocation.getCurrentPosition((info) => {
       setLocation(info.coords);
     });
   }, []);
+
+  const [type, setType] = useState(CameraType.front);
+
+  function toggleCameraType() {
+    setType((current) =>
+      current === CameraType.back ? CameraType.front : CameraType.back
+    );
+  }
 
   return (
     <React.StrictMode>
@@ -39,6 +57,13 @@ export default function App() {
           )}
         </View>
         <StatusBar style="auto" />
+        <Camera style={styles.camera} type={type}>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+              <Text style={styles.text}>Flip Camera</Text>
+            </TouchableOpacity>
+          </View>
+        </Camera>
       </View>
     </React.StrictMode>
   );
@@ -56,5 +81,25 @@ const styles = StyleSheet.create({
     margin: "10px",
     padding: "5px",
     border: "solid black 2px",
+  },
+
+  camera: {
+    flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
   },
 });
