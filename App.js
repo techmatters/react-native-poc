@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Geolocation from "@react-native-community/geolocation";
+import * as Location from "expo-location";
 
 if (Platform.OS == "web") {
   // https://github.com/expo/expo/issues/19485
@@ -49,9 +49,15 @@ export default function App() {
   const [location, setLocation] = useState(null);
 
   useEffect(() => {
-    Geolocation.getCurrentPosition((info) => {
-      setLocation(info.coords);
-    });
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.debug("No permission to access location");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords);
+    })();
   }, []);
 
   const [type, setType] = useState(CameraType.front);
