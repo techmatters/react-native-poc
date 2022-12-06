@@ -5,8 +5,8 @@ import {
   Button,
   Image,
   Platform,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -15,6 +15,7 @@ import {
 import * as Location from "expo-location";
 
 if (Platform.OS == "web") {
+  // expo uses some web APIs that Firefox has not implemented
   // https://github.com/expo/expo/issues/19485
   const query = navigator.permissions.query;
 
@@ -66,6 +67,7 @@ export default function App() {
   const cameraRef = useRef(null);
   const [imageProps, setImageProps] = useState(null);
 
+  /*
   if (!permission) {
     // Camera permissions are still loading
     return <View />;
@@ -81,7 +83,7 @@ export default function App() {
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
-  }
+  }*/
 
   function toggleCameraType() {
     setType((current) =>
@@ -100,16 +102,11 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contnentContainerStyle={styles.container}>
       <Text>Please input the scene name</Text>
       <TextInput style={styles.nameInput} value={name} onChangeText={setName} />
       <View>
-        {(name && (
-          <Text>
-            <p>Scene</p>
-            <p>{name}</p>
-          </Text>
-        )) || <Text></Text>}
+        {(name && <Text>Scene {name}</Text>) || <Text></Text>}
         {location ? (
           <Text>
             You are at: {location.latitude.toLocaleString()},{" "}
@@ -120,6 +117,7 @@ export default function App() {
         )}
       </View>
       <StatusBar style="auto" />
+
       <Camera
         style={styles.camera}
         type={type}
@@ -137,12 +135,12 @@ export default function App() {
         <Image
           source={{
             uri: imageProps.dataUri,
-            height: imageProps.height,
-            width: imageProps.width,
+            height: 200,
+            width: 200,
           }}
         />
       )}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -150,24 +148,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    boxSizing: "border-box",
   },
   nameInput: {
-    margin: "10px",
-    padding: "5px",
-    border: "solid black 2px",
+    padding: 5,
+    border: "solid black 2",
   },
 
   camera: {
     flex: 1,
+    height: 300,
   },
   buttonContainer: {
     flex: 1,
     flexDirection: "row",
     backgroundColor: "transparent",
-    margin: 64,
   },
   button: {
     flex: 1,
