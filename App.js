@@ -61,8 +61,8 @@ export default function App() {
     })();
   }, []);
 
-  const [type, setType] = useState(CameraType.front);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [type, setType] = useState(CameraType.back);
+  //const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
   const cameraRef = useRef(null);
   const [imageProps, setImageProps] = useState(null);
@@ -83,7 +83,7 @@ export default function App() {
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
-  }*/
+  } */
 
   function toggleCameraType() {
     setType((current) =>
@@ -97,12 +97,11 @@ export default function App() {
     }
     cameraRef.current.takePictureAsync().then(({ uri, width, height }) => {
       setImageProps({ dataUri: uri, width, height });
-      console.debug(uri, width, height);
     });
   }
 
   return (
-    <ScrollView contnentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text>Please input the scene name</Text>
       <TextInput style={styles.nameInput} value={name} onChangeText={setName} />
       <View>
@@ -146,17 +145,18 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
+    flex: 1,
+    width: "70%",
+    alignSelf: "center",
   },
   nameInput: {
     padding: 5,
     border: "solid black 2",
   },
-
   camera: {
-    flex: 1,
-    height: 300,
+    flex: 10,
+    height: 600,
   },
   buttonContainer: {
     flex: 1,
