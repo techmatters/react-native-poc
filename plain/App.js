@@ -6,9 +6,10 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import type {Node} from 'react';
 import {
+  PermissionsAndroid,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -25,6 +26,33 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import Geolocation from '@react-native-community/geolocation';
+
+const requestLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Example App Location Permission',
+        message: 'Cool Photo App needs access your location ',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can use the camera');
+      return true;
+    } else {
+      console.log('Camera permission denied');
+      return false;
+    }
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -56,10 +84,22 @@ const Section = ({children, title}): Node => {
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [hasPermissions, setPermissions] = useState(false);
+  const [location, setLocation] = useState(null);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  useEffect(() => {
+    requestLocationPermission().then(granted => {
+      setPermissions(granted);
+      if (!granted) {
+        return;
+      }
+      Geolocation.getCurrentPosition(info => setLocation(info.coords));
+    });
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -75,20 +115,13 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          {hasPermissions && location ? (
+            <Text>
+              You are located at: {location.latitude}, {location.longitude}
+            </Text>
+          ) : (
+            <Text>I don't know where you are located!</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
